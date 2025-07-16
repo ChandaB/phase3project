@@ -21,6 +21,20 @@ async function getCustomers() {
     }
 }
 
+async function getCustomerById(id) {
+    try {
+        const customer = await collection.findOne({ id: +id });
+        // return array [customer, errMessage]
+        if (!customer) {
+            return [null, "invalid customer number"];
+        }
+        return [customer, null];
+    } catch (error) {
+        console.error('Error fetching customer by ID:', error.message);
+        return [null, err.message];
+    }
+}
+
 async function resetCustomers() {
     let data = [{ "id": 0, "name": "Mary Jackson", "email": "maryj@abc.com", "password": "maryj" },
     { "id": 1, "name": "Karen Addams", "email": "karena@abc.com", "password": "karena" },
@@ -38,9 +52,9 @@ async function resetCustomers() {
     }
 }
 
-async function addCustomer(newCustomer) {
+async function addCustomer(customer) {
     try {
-        const insertResult = await collection.insertOne(newCustomer);
+        const insertResult = await collection.insertOne(customer);
         // return array [status, id, errMessage]
         return ["success", insertResult.insertedId, null];
     } catch (err) {
@@ -51,4 +65,4 @@ async function addCustomer(newCustomer) {
 
 
 dbStartup();
-module.exports = { getCustomers, resetCustomers, addCustomer };
+module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer };
