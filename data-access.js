@@ -12,7 +12,13 @@ async function dbStartup() {
 }
 
 async function getCustomers() {
-    return await collection.find().toArray();
+    try {
+        const customers = await collection.find().toArray();
+        return [customers, null];
+    } catch (error) {
+        console.error('Error fetching customers from the database:', error);
+        return [null, error.message];
+    }
 }
 
 dbStartup();
