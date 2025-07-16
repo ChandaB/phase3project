@@ -63,6 +63,21 @@ async function addCustomer(customer) {
     }
 }
 
+async function updateCustomer(id, customer) {
+    try {
+        const updateResult = await collection.updateOne(
+            { id: +id },
+            { $set: { ...customer } }
+        );
+        if (updateResult.matchedCount === 0) {
+            return [null, "Customer not found"];
+        }
+        return ["one record updated", null];
+    } catch (error) {
+        console.log(error.message);
+        return [null, error.message];
+    }
+}
 
 dbStartup();
-module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer };
+module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer };
