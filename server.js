@@ -23,10 +23,20 @@ app.listen(PORT, () => {
 app.get('/customers', async (req, res) => {
     console.log
     try {
-       const [customers, error] = await da.getCustomers(); 
-       res.send(customers);
+        const [customers, error] = await da.getCustomers();
+        res.send(customers);
     } catch (error) {
         console.error('Error fetching customers:', error);
         res.status(500).send(error);
+    }
+});
+
+app.get("/reset", async (req, res) => {
+    const [result, err] = await da.resetCustomers();
+    if (result) {
+        res.send(result);
+    } else {
+        res.status(500);
+        res.send(err);
     }
 });

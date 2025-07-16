@@ -21,5 +21,23 @@ async function getCustomers() {
     }
 }
 
+async function resetCustomers() {
+    let data = [{ "id": 0, "name": "Mary Jackson", "email": "maryj@abc.com", "password": "maryj" },
+    { "id": 1, "name": "Karen Addams", "email": "karena@abc.com", "password": "karena" },
+    { "id": 2, "name": "Scott Ramsey", "email": "scottr@abc.com", "password": "scottr" }];
+
+    try {
+        await collection.deleteMany({});
+        await collection.insertMany(data);
+        const customers = await collection.find().toArray();
+        const message = "Data was refreshed. There are now " + customers.length + " customer records!" + "<br><br>" + JSON.stringify(customers, null, 2);
+        return [message, null];
+    } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+    }
+}
+
+
 dbStartup();
-module.exports = { getCustomers };
+module.exports = { getCustomers, resetCustomers };
