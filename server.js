@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import bodyParser from 'body-parser';
 
 //import the data access module
 import da from './data-access.js';
@@ -12,12 +13,18 @@ const PORT = process.env.PORT || 4000;
 
 //Implement a static file server
 const directoryPath = path.join(path.resolve(), 'public');
+
+app.use(bodyParser.json());
 app.use(express.static(directoryPath));
+
+// Serve index.html for the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(directoryPath, 'index.html'));
+});
 
 //Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-
 });
 
 app.get('/customers', async (req, res) => {
@@ -38,5 +45,25 @@ app.get("/reset", async (req, res) => {
     } else {
         res.status(500);
         res.send(err);
+    }
+});
+
+app.post('/customers', async (req, res) => {
+    const newCustomer = req.body;
+    if (newCustomer === null || req.body == {}) {
+        res.status(400);
+        res.send("Missing request body");
+    } else {
+        // return array format [status, id, errMessage]
+        const [status, id, errMessage] = await da.addCustomer(newCustomer);
+        if (status === "success") {
+            res.status(201);
+            let response = { ...newCustomer };
+            response["_id"] = id;
+            res.send(response);
+        } else {
+            res.status(400);
+            res.send(errMessage);
+        }
     }
 });
