@@ -17,14 +17,14 @@ const directoryPath = path.join(path.resolve(), 'public');
 app.use(bodyParser.json());
 app.use(express.static(directoryPath));
 
-// Serve index.html for the root route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(directoryPath, 'index.html'));
-});
-
 //Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+// Serve index.html for the root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(directoryPath, 'index.html'));
 });
 
 app.get('/customers', async (req, res) => {
