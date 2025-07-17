@@ -2,6 +2,7 @@ const { MongoClient } = require('mongodb');
 const dbName = 'custdb';
 const baseUrl = "mongodb://127.0.0.1:27017";
 const collectionName = "customers"
+const apiKeyCollectionName = "apikeys";
 const connectString = baseUrl + "/" + dbName;
 let collection;
 
@@ -9,6 +10,7 @@ async function dbStartup() {
     const client = new MongoClient(connectString);
     await client.connect();
     collection = client.db(dbName).collection(collectionName);
+    apiKeyCollection = client.db(dbName).collection(apiKeyCollectionName);
 }
 
 async function getCustomers() {
@@ -92,5 +94,16 @@ async function deleteCustomerById(id) {
     }
 }
 
+//Determine if the API key in request header is valid
+async function isValidApiKey(apiKey) {  
+    try {
+        const apiKeyDoc = await apiKeyCollection.findOne({ "x-api-key": apiKey });
+        return apiKeyDoc !== null;
+    } catch (error) {
+        console.error('API key doesn\'t exist:', error);
+        return false;
+    }
+}
+
 dbStartup();
-module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer, deleteCustomerById };
+module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer, deleteCustomerById, isValidApiKey };
