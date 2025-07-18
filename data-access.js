@@ -105,5 +105,16 @@ async function isValidApiKey(apiKey) {
     }
 }
 
+//Add a funtion to add a new API key to the apiKeyCollection
+async function addApiKey(apiKey) { 
+    try {
+        const insertResult = await apiKeyCollection.insertOne({ "x-api-key": apiKey });
+        return;
+    } catch (error) {
+        console.error('Error adding API key to database:', error);
+        return;
+    }   
+}
+
 dbStartup();
-module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer, deleteCustomerById, isValidApiKey };
+module.exports = { dbStartup, getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer, deleteCustomerById, isValidApiKey, addApiKey };
