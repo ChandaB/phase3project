@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 // Import the API key check middleware
-import { apiKeyCheck } from './apiKeyCheck.js'; 
+import { apiKeyCheck } from './apiKeyCheck.js';
 
 //import the data access module
 import da from './data-access.js';
@@ -27,6 +27,40 @@ app.listen(PORT, () => {
 // Serve index.html for the root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(directoryPath, 'index.html'));
+});
+
+//This GET must be before the regular /customers route or else it will not be called
+app.get("/customers/find/", apiKeyCheck, async (req, res) => {
+    if (!req.query.id && !req.query.email && !req.query.password) {
+        res.status(404);
+        res.send("Query parameter must be of id, email or password, please provide a valid query parameter in your request");
+        return;
+    }
+    let id = +req.query.id;
+    console.log("id:", req.query.id);
+    let email = req.query.email;
+    console.log("email:", email);
+    let password = req.query.password;
+    let query = null;
+    if (id > -1) {
+        query = { "id": id };
+    } else if (email) {
+        query = { "email": email };
+    } else if (password) {
+        query = { "password": password }
+    }
+    if (query) {
+        const [customers, err] = await da.findCustomers(query);
+        if (customers) {
+            res.send(customers);
+        } else {
+            res.status(404);
+            res.send(err);
+        }
+    } else {
+        res.status(400);
+        res.send("Query parameter value is required");
+    }
 });
 
 app.get('/customers', apiKeyCheck, async (req, res) => {

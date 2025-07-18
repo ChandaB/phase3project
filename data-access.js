@@ -25,6 +25,7 @@ async function getCustomers() {
 
 async function getCustomerById(id) {
     try {
+        console.log('Fetching customer with ID:', id);
         const customer = await collection.findOne({ id: +id });
         // return array [customer, errMessage]
         if (!customer) {
@@ -105,5 +106,20 @@ async function isValidApiKey(apiKey) {
     }
 }
 
+async function findCustomers(filterObject) {
+    try {
+        console.log('Finding customers with filter:', filterObject);
+        const customers = await collection.find(filterObject).toArray();
+        // return array [customer, errMessage]
+        if(!customers|| customers.length == 0 ){
+          return [ null, "no customer documents found"];
+        }
+        return [customers, null];
+    } catch (err) {
+        console.log(err.message);
+        return [null, err.message];
+    }
+}
+
 dbStartup();
-module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer, deleteCustomerById, isValidApiKey };
+module.exports = { getCustomers, getCustomerById, resetCustomers, addCustomer, updateCustomer, deleteCustomerById, isValidApiKey, findCustomers };
